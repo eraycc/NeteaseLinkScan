@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网易云音乐短链检查工具</title>
+    <link href="https://cdn.jsdmirror.cn/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdmirror.cn/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --vip-color: #28a745;
+            --gift-color: #ffc107;
+            --info-color: #17a2b8;
+            --error-color: #dc3545;
+            /* 优化后的日志颜色 */
+            --log-success-color: #155724;
+            --log-success-bg: #d4edda;
+            --log-warning-color: #856404;
+            --log-warning-bg: #fff3cd;
+            --log-danger-color: #721c24;
+            --log-danger-bg: #f8d7da;
+            --log-info-color: #0c5460;
+            --log-info-bg: #d1ecf1;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 20px;
+        }
+        
+        .result-card {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            border-left: 4px solid;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .vip-card {
+            border-left-color: var(--vip-color);
+        }
+        
+        .gift-card {
+            border-left-color: var(--gift-color);
+        }
+        
+        .config-card {
+            background-color: #f8f9fa;
+        }
+        
+        /* 优化后的日志样式 */
+        .log-entry {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 0.875rem;
+            padding: 10px 16px;
+            margin: 2px 0;
+            border-radius: 6px;
+            border-left: 4px solid transparent;
+            line-height: 1.4;
+            word-break: break-word;
+            white-space: normal;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .log-entry:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 批次日志特殊样式 */
+        .log-batch {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-left-color: #2196f3;
+            color: #1565c0;
+            font-weight: 500;
+        }
+        
+        /* 优化后的日志颜色方案 */
+        .log-success {
+            color: var(--log-success-color);
+            background-color: var(--log-success-bg);
+            border-left-color: #28a745;
+        }
+        
+        .log-warning {
+            color: var(--log-warning-color);
+            background-color: var(--log-warning-bg);
+            border-left-color: #ffc107;
+        }
+        
+        .log-danger {
+            color: var(--log-danger-color);
+            background-color: var(--log-danger-bg);
+            border-left-color: #dc3545;
+        }
+        
+        .log-info {
+            color: var(--log-info-color);
+            background-color: var(--log-info-bg);
+            border-left-color: #17a2b8;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #progressBar {
+            transition: width 0.3s ease;
+        }
+        
+        .url-container {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all;
+        }
+        
+        .url-line {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .expandable {
+            cursor: pointer;
+        }
+        
+        .expanded {
+            white-space: normal;
+            word-break: break-all;
+        }
+        
+        .card-body-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0 !important;
+        }
+        
+        .result-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* 优化日志卡片样式 */
+        .log-card {
+            border-radius: 8px;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .log-card .card-body {
+            padding: 0;
+        }
+        
+        .log-card .card-header {
+            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        /* 日志输出容器优化 */
+        #logOutput {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* 日志为空时的提示 */
+        .log-empty {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        /* 批次统计样式 */
+        .batch-stats {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .batch-stats h6 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .batch-stats .row {
+            text-align: center;
+        }
+        
+        .batch-stats .badge {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+        
+        /* 批次计算器样式 */
+        .batch-calculator {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .batch-calculator .text-warning {
+            color: #856404 !important;
+        }
+        
+        /* 高级配置折叠样式 */
+        .advanced-config {
+            border-top: 1px solid #dee2e6;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+        
+        .advanced-toggle {
+            cursor: pointer;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .advanced-toggle:hover {
+            color: #495057;
+            text-decoration: underline;
+        }
+        
+        .advanced-toggle i {
+            transition: transform 0.2s ease;
+        }
+        
+        .advanced-toggle.collapsed i {
+            transform: rotate(-90deg);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .card-body-scroll {
+                max-height: 200px;
+            }
+            
+            .log-entry {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            #logOutput {
+                max-height: 250px;
+                padding: 6px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .card-body-scroll {
+                max-height: 400px;
+            }
+            
+            #logOutput {
+                max-height: 450px;
+            }
+        }
+        
+        /* 优化进度条在移动端的显示 */
+        .progress {
+            height: 25px;
+        }
+        
+        /* 优化状态消息显示 */
+        #statusMessage {
+            margin-bottom: 15px;
+        }
+        
+        /* 优化滚动条样式 */
+        .card-body-scroll::-webkit-scrollbar,
+        #logOutput::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .card-body-scroll::-webkit-scrollbar-track,
+        #logOutput::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .card-body-scroll::-webkit-scrollbar-thumb,
+        #logOutput::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .card-body-scroll::-webkit-scrollbar-thumb:hover,
+        #logOutput::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* 日志时间戳样式优化 */
+        .log-timestamp {
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        
+        .log-code {
+            font-weight: 500;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        
+        .log-message {
+            font-weight: 500;
+        }
+        
+        /* 批次详情样式 */
+        .batch-details {
+            margin-top: 5px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4"><i class="bi bi-link-45deg"></i>网易云音乐短链检查工具</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card config-card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-gear"></i> 配置选项
+                    </div>
+                    <div class="card-body">
+                        <form id="configForm">
+                            <div class="mb-3">
+                                <label for="startSuffix" class="form-label">起始短链后缀</label>
+                                <input type="text" class="form-control" id="startSuffix" value="Bm5xqZ" required>
+                                <div class="form-text">请输入后6位Base62编码的短链后缀，如：http://163cn.tv/FBm5xqZ，只填写Bm5xqZ</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="prefix" class="form-label">短链前缀</label>
+                                <input type="text" class="form-control" id="prefix" value="F" required>
+                                <div class="form-text">短链的第一个字符，如：F</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="maxRange" class="form-label">最大遍历范围</label>
+                                <input type="number" class="form-control" id="maxRange" value="900000000" required>
+                                <div class="form-text">从起始ID开始检查的数量</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="batchSize" class="form-label">每批处理数量</label>
+                                <input type="number" class="form-control" id="batchSize" value="50" min="1" max="100" required>
+                                <div class="form-text">每次并发请求的链接数量，建议10-100</div>
+                            </div>
+                            
+                            <!-- 新增：自定义起始批次 -->
+                            <div class="mb-3">
+                                <label for="startBatch" class="form-label">
+                                    自定义起始批次
+                                    <i class="bi bi-info-circle" data-bs-toggle="tooltip" 
+                                       title="设置从第几批开始检测，默认从第1批开始。用于跳过已检测的批次。"></i>
+                                </label>
+                                <input type="number" class="form-control" id="startBatch" min="1" placeholder="留空则从第1批开始">
+                                <div class="form-text">留空或输入1表示从第1批开始，大于1则跳过前面的批次</div>
+                                
+                                <!-- 批次计算显示 -->
+                                <div id="batchCalculator" class="batch-calculator hidden">
+                                    <div class="text-warning">
+                                        <i class="bi bi-calculator"></i> 批次计算：
+                                    </div>
+                                    <div id="batchInfo"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- 高级配置折叠区域 -->
+                            <div class="advanced-config">
+                                <a class="advanced-toggle collapsed" data-bs-toggle="collapse" href="#advancedConfig">
+                                    <i class="bi bi-chevron-down"></i> 高级配置
+                                </a>
+                                
+                                <div class="collapse" id="advancedConfig">
+                                    <div class="mt-3">
+                                        <div class="mb-3">
+                                            <label for="base62Chars" class="form-label">Base62字符集</label>
+                                            <input type="text" class="form-control" id="base62Chars" 
+                                                   value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" required>
+                                            <div class="form-text">自定义Base62编码字符顺序</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="sleepTime" class="form-label">检查间隔(秒)</label>
+                                            <input type="number" class="form-control" id="sleepTime" value="0.5" min="0.1" step="0.1" required>
+                                            <div class="form-text">批次之间的间隔时间</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="timeout" class="form-label">请求超时(秒)</label>
+                                            <input type="number" class="form-control" id="timeout" value="5" min="1" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
+                                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                                    <span id="submitText">开始检查</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="pauseBtn">暂停</button>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button" class="btn btn-outline-danger hidden" id="deleteResultsBtn">
+                                    <i class="bi bi-trash"></i> 删除当前检测信息
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <i class="bi bi-speedometer2"></i> 进度监控
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-3">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div id="statusMessage" class="alert mb-3"></div>
+                        
+                        <!-- 批次统计信息 -->
+                        <div id="batchStats" class="batch-stats hidden">
+                            <h6><i class="bi bi-graph-up"></i> 批次统计</h6>
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <span class="badge bg-primary">批次 <span id="currentBatch">0</span>/<span id="totalBatches">0</span></span>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <span class="badge bg-success">当前批次 <span id="currentBatchSize">0</span></span>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <span class="badge bg-info">平均速度 <span id="avgSpeed">0</span>/分钟</span>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <span class="badge bg-secondary">已用时间 <span id="elapsedTime">0秒</span></span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-6 mb-2">
+                                    <span class="badge bg-warning text-dark">跳过批次 <span id="skippedBatches">0</span></span>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <span class="badge bg-dark">总进度 <span id="overallProgress">0</span>%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-2 mb-md-0">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">已检查</h6>
+                                        <h4 id="checkedCount" class="card-text">0</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">当前检查</h6>
+                                        <h4 id="currentCode" class="card-text">-</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <i class="bi bi-check-circle"></i> VIP链接 (<span id="vipCount">0</span>)
+                            </div>
+                            <div class="card-body-scroll" id="vipResults"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning text-dark">
+                                <i class="bi bi-gift"></i> 礼物链接 (<span id="giftCount">0</span>)
+                            </div>
+                            <div class="card-body-scroll" id="giftResults"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 log-card">
+                    <div class="card-header text-white">
+                        <i class="bi bi-list-check"></i> 检查日志
+                    </div>
+                    <div class="card-body">
+                        <div id="logOutput">
+                            <div class="log-empty">暂无日志记录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdmirror.cn/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let pollingInterval;
+        let isProcessing = false;
+        let currentConfig = {};
+        let startTime = null;
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('configForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                startProcessing();
+            });
+            
+            document.getElementById('pauseBtn').addEventListener('click', toggleProcessing);
+            document.getElementById('deleteResultsBtn').addEventListener('click', deleteResults);
+            
+            // 监听批次相关输入变化，更新计算器
+            document.getElementById('maxRange').addEventListener('input', updateBatchCalculator);
+            document.getElementById('batchSize').addEventListener('input', updateBatchCalculator);
+            document.getElementById('startBatch').addEventListener('input', updateBatchCalculator);
+            
+            // 初始化tooltip
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // 加载保存的配置（如果有）
+            loadSavedConfig();
+            updateBatchCalculator();
+        });
+        
+        function updateBatchCalculator() {
+            const maxRange = parseInt(document.getElementById('maxRange').value) || 0;
+            const batchSize = parseInt(document.getElementById('batchSize').value) || 1;
+            const startBatch = parseInt(document.getElementById('startBatch').value) || 1;
+            
+            if (maxRange > 0 && batchSize > 0) {
+                const totalBatches = Math.ceil(maxRange / batchSize);
+                const startId = (startBatch - 1) * batchSize;
+                const skippedCount = startId;
+                const remainingCount = maxRange - skippedCount;
+                const remainingBatches = Math.ceil(remainingCount / batchSize);
+                
+                const calculator = document.getElementById('batchCalculator');
+                const batchInfo = document.getElementById('batchInfo');
+                
+                if (startBatch > 1) {
+                    calculator.classList.remove('hidden');
+                    batchInfo.innerHTML = `
+                        <div><strong>总批次数：</strong>${totalBatches.toLocaleString()}</div>
+                        <div><strong>起始批次：</strong>第 ${startBatch.toLocaleString()} 批</div>
+                        <div><strong>跳过数量：</strong>${skippedCount.toLocaleString()} 个ID</div>
+                        <div><strong>剩余检测：</strong>${remainingCount.toLocaleString()} 个ID</div>
+                        <div><strong>剩余批次：</strong>${remainingBatches.toLocaleString()} 批</div>
+                    `;
+                    
+                    // 验证起始批次是否有效
+                    if (startBatch > totalBatches) {
+                        batchInfo.innerHTML += `<div class="text-danger mt-2"><i class="bi bi-exclamation-triangle"></i> 警告：起始批次超过总批次数！</div>`;
+                    }
+                } else {
+                    calculator.classList.add('hidden');
+                }
+            }
+        }
+        
+        function startProcessing() {
+            const startSuffix = document.getElementById('startSuffix').value.trim();
+            const maxRange = document.getElementById('maxRange').value;
+            const batchSize = document.getElementById('batchSize').value;
+            const startBatch = document.getElementById('startBatch').value;
+            const prefix = document.getElementById('prefix').value.trim();
+            const base62Chars = document.getElementById('base62Chars').value.trim();
+            const sleepTime = document.getElementById('sleepTime').value;
+            const timeout = document.getElementById('timeout').value;
+            
+            if (!validateInputs(startSuffix, maxRange, prefix, base62Chars, batchSize, startBatch)) {
+                return;
+            }
+            
+            currentConfig = {
+                start_suffix: startSuffix,
+                max_range: parseInt(maxRange),
+                start_batch: parseInt(startBatch) || 1,
+                config: {
+                    prefix: prefix,
+                    base62_chars: base62Chars,
+                    BASE: base62Chars.length,
+                    sleep_time: parseFloat(sleepTime),
+                    timeout: parseInt(timeout),
+                    batch_size: parseInt(batchSize)
+                }
+            };
+            
+            // 记录开始时间
+            if (!startTime) {
+                startTime = Date.now();
+            }
+            
+            // 保存配置到本地存储
+            saveConfig();
+            
+            // 更新UI状态
+            updateUIState(true);
+            
+            // 开始处理
+            processNextBatch();
+        }
+        
+        function validateInputs(startSuffix, maxRange, prefix, base62Chars, batchSize, startBatch) {
+            if (!startSuffix || !maxRange || !prefix || !base62Chars || !batchSize) {
+                showAlert('请填写所有必填字段', 'danger');
+                return false;
+            }
+            
+            if (startSuffix.length !== 6) {
+                showAlert('短链后缀必须是6位字符', 'danger');
+                return false;
+            }
+            
+            if (prefix.length !== 1) {
+                showAlert('短链前缀必须是1位字符', 'danger');
+                return false;
+            }
+            
+            const batchSizeNum = parseInt(batchSize);
+            if (batchSizeNum < 1 || batchSizeNum > 100) {
+                showAlert('每批处理数量必须在1-100之间', 'danger');
+                return false;
+            }
+            
+            const maxRangeNum = parseInt(maxRange);
+            const startBatchNum = parseInt(startBatch) || 1;
+            const totalBatches = Math.ceil(maxRangeNum / batchSizeNum);
+            
+            if (startBatchNum > totalBatches) {
+                showAlert(`起始批次(${startBatchNum})不能超过总批次数(${totalBatches})`, 'danger');
+                return false;
+            }
+            
+            if (startBatchNum < 1) {
+                showAlert('起始批次必须大于等于1', 'danger');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function toggleProcessing() {
+            if (isProcessing) {
+                pauseProcessing();
+                this.textContent = '继续';
+            } else {
+                startProcessing();
+                this.textContent = '暂停';
+            }
+        }
+        
+        function pauseProcessing() {
+            clearTimeout(pollingInterval);
+            isProcessing = false;
+            updateUIState(false);
+            updateStatusMessage('处理已暂停', 'warning');
+        }
+        
+        function updateUIState(processing) {
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const submitText = document.getElementById('submitText');
+            
+            if (processing) {
+                document.getElementById('deleteResultsBtn').classList.remove('hidden');
+                document.getElementById('batchStats').classList.remove('hidden');
+                submitBtn.disabled = true;
+                loadingSpinner.classList.remove('d-none');
+                submitText.textContent = '处理中...';
+                isProcessing = true;
+            } else {
+                submitBtn.disabled = false;
+                loadingSpinner.classList.add('d-none');
+                submitText.textContent = '开始检查';
+            }
+        }
+        
+        function processNextBatch() {
+            if (!isProcessing) return;
+            
+            fetch('api.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentConfig)
+            })
+            .then(handleResponse)
+            .then(data => {
+                updateUI(data);
+                
+                if (data.status === 'completed') {
+                    processingComplete();
+                } else if (isProcessing) {
+                    pollingInterval = setTimeout(processNextBatch, currentConfig.config.sleep_time * 1000);
+                }
+            })
+            .catch(handleError);
+        }
+        
+        function handleResponse(response) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        }
+        
+        function handleError(error) {
+            console.error('Error:', error);
+            showAlert(`请求失败: ${error.message}`, 'danger');
+            pauseProcessing();
+        }
+        
+        function updateUI(data) {
+            updateProgress(data);
+            updateStatus(data);
+            updateCounters(data);
+            updateBatchStats(data);
+            updateResults(data);
+            updateLog(data);
+        }
+        
+        function updateProgress(data) {
+            const progress = data.progress ? Math.min(100, data.progress) : 0;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressBar').textContent = `${progress.toFixed(1)}%`;
+        }
+        
+        function updateStatus(data) {
+            const statusClass = data.status === 'completed' ? 'success' : 'info';
+            updateStatusMessage(data.message || '处理中...', statusClass);
+        }
+        
+        function updateCounters(data) {
+            document.getElementById('checkedCount').textContent = data.checked || 0;
+            document.getElementById('currentCode').textContent = data.current_code || '-';
+        }
+        
+        function updateBatchStats(data) {
+            if (data.batch_stats) {
+                const stats = data.batch_stats;
+                const config = currentConfig.config;
+                const startBatch = currentConfig.start_batch || 1;
+                
+                // 计算实际的批次号（考虑起始批次）
+                const actualCurrentBatch = (startBatch - 1) + (stats.completed_batches || 0);
+                const skippedBatches = startBatch - 1;
+                
+                document.getElementById('currentBatch').textContent = actualCurrentBatch;
+                document.getElementById('totalBatches').textContent = stats.total_batches || 0;
+                document.getElementById('currentBatchSize').textContent = stats.current_batch_size || 0;
+                document.getElementById('skippedBatches').textContent = skippedBatches;
+                
+                // 计算总体进度（包括跳过的部分）
+                const totalRange = currentConfig.max_range;
+                const processedCount = (data.checked || 0) + (skippedBatches * config.batch_size);
+                const overallProgress = Math.min(100, (processedCount / totalRange) * 100);
+                document.getElementById('overallProgress').textContent = overallProgress.toFixed(1);
+                
+                // 计算平均速度和已用时间
+                if (startTime) {
+                    const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+                    const elapsedMinutes = elapsedSeconds / 60;
+                    document.getElementById('elapsedTime').textContent = formatTime(elapsedSeconds);
+                    
+                    if (elapsedMinutes > 0 && data.checked) {
+                        const avgSpeed = Math.round(data.checked / elapsedMinutes);
+                        document.getElementById('avgSpeed').textContent = avgSpeed;
+                    }
+                }
+            }
+        }
+        
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}小时${minutes}分${secs}秒`;
+            } else if (minutes > 0) {
+                return `${minutes}分${secs}秒`;
+            } else {
+                return `${secs}秒`;
+            }
+        }
+        
+        function updateResults(data) {
+            if (data.vip_links) {
+                updateResultSection('vip', Object.values(data.vip_links));
+            }
+            if (data.gift_links) {
+                updateResultSection('gift', Object.values(data.gift_links));
+            }
+        }
+        
+        function updateResultSection(type, links) {
+            const containerId = `${type}Results`;
+            const countId = `${type}Count`;
+            
+            document.getElementById(countId).textContent = links.length;
+            
+            const resultsHTML = links.map(link => createResultCard(type, link)).join('');
+            document.getElementById(containerId).innerHTML = resultsHTML;
+            
+            // 添加点击事件来展开/折叠长URL
+            document.querySelectorAll(`#${containerId} .expandable`).forEach(el => {
+                el.addEventListener('click', function() {
+                    this.classList.toggle('expanded');
+                });
+            });
+        }
+        
+        function createResultCard(type, link) {
+            const typeClass = type === 'vip' ? 'vip-card' : 'gift-card';
+            const btnClass = type === 'vip' ? 'btn-success' : 'btn-warning';
+            
+            return `
+                <div class="result-card ${typeClass}">
+                    <div class="result-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1 me-2">
+                                <h6 class="card-title mb-1 url-line">${link.url}</h6>
+                                <p class="card-text text-muted small mb-0">
+                                    <span class="expandable url-container" title="点击展开/折叠">
+                                        跳转到: ${link.redirect}
+                                    </span>
+                                </p>
+                            </div>
+                            <a href="${link.url}" target="_blank" class="btn btn-sm ${btnClass}">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateLog(data) {
+            const logOutput = document.getElementById('logOutput');
+            
+            if (!data.log || data.log.length === 0) {
+                logOutput.innerHTML = '<div class="log-empty">暂无日志记录</div>';
+                return;
+            }
+            
+            logOutput.innerHTML = data.log.map(log => createLogEntry(log)).join('');
+            logOutput.scrollTop = logOutput.scrollHeight;
+        }
+        
+        function createLogEntry(log) {
+            const logClass = getLogClass(log.result);
+            const timestamp = sanitizeText(log.time);
+            const code = sanitizeText(log.code);
+            const resultText = getResultText(log.result);
+            
+            let entryHTML = `
+                <div class="log-entry ${logClass}">
+                    <span class="log-timestamp">[${timestamp}]</span>
+                    <span class="log-code">${code}</span>
+                    <span class="log-message"> - ${resultText}</span>
+            `;
+            
+            // 如果是批次日志，添加详细信息
+            if (log.result === 'batch_completed' && log.details) {
+                const details = log.details;
+                entryHTML += `
+                    <div class="batch-details">
+                        批次大小: ${details.batch_size} | 
+                        VIP: ${details.vip_found} | 
+                        礼物: ${details.gift_found} | 
+                        其他: ${details.other_redirect} | 
+                        无效: ${details.invalid} | 
+                        错误: ${details.error}
+                    </div>
+                `;
+            }
+            
+            entryHTML += '</div>';
+            return entryHTML;
+        }
+        
+        function sanitizeText(text) {
+            if (!text) return '';
+            return text.toString().trim().replace(/\s+/g, ' ');
+        }
+        
+        function getLogClass(result) {
+            const classMap = {
+                'vip': 'log-success',
+                'gift': 'log-success',
+                'other_redirect': 'log-warning',
+                'invalid': 'log-info',
+                'error': 'log-danger',
+                'batch_completed': 'log-batch',
+                'config_updated': 'log-info',
+                'batch_skipped': 'log-warning'
+            };
+            return classMap[result] || 'log-info';
+        }
+        
+        function getResultText(result) {
+            const resultTexts = {
+                'vip': '✅ VIP链接',
+                'gift': '🎁 礼物链接',
+                'other_redirect': '⚠️ 其他跳转',
+                'invalid': '❌ 无效链接',
+                'error': '⚠️ 请求错误',
+                'batch_completed': '📦 批次完成',
+                'config_updated': '⚙️ 配置更新',
+                'batch_skipped': '⏭️ 批次跳过'
+            };
+            return resultTexts[result] || result;
+        }
+        
+        function updateStatusMessage(message, type = 'info') {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.innerHTML = `
+                <div class="alert alert-${type} mb-0">
+                    <strong>状态：</strong> ${message}
+                </div>
+            `;
+        }
+        
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.role = 'alert';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            document.querySelector('.container').prepend(alert);
+            
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        }
+        
+        function processingComplete() {
+            clearTimeout(pollingInterval);
+            isProcessing = false;
+            updateUIState(false);
+            document.getElementById('progressBar').classList.remove('progress-bar-animated');
+            showAlert('处理完成！', 'success');
+        }
+        
+        function deleteResults() {
+            if (!confirm('确定要删除当前配置的检测信息吗？此操作将删除缓存的日志文件且不可恢复！')) {
+                return;
+            }
+            
+            fetch('api.php?action=delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(currentConfig)
+            })
+            .then(handleResponse)
+            .then(data => {
+                if (data.success) {
+                    showAlert('已成功删除当前检测信息', 'success');
+                    resetUI();
+                } else {
+                    showAlert('删除失败: ' + data.message, 'danger');
+                }
+            })
+            .catch(handleError);
+        }
+        
+        function resetUI() {
+            document.getElementById('vipResults').innerHTML = '';
+            document.getElementById('giftResults').innerHTML = '';
+            document.getElementById('vipCount').textContent = '0';
+            document.getElementById('giftCount').textContent = '0';
+            document.getElementById('logOutput').innerHTML = '<div class="log-empty">暂无日志记录</div>';
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('checkedCount').textContent = '0';
+            document.getElementById('currentCode').textContent = '-';
+            document.getElementById('batchStats').classList.add('hidden');
+            document.getElementById('batchCalculator').classList.add('hidden');
+            updateStatusMessage('检测信息已重置', 'info');
+            document.getElementById('deleteResultsBtn').classList.add('hidden');
+            startTime = null;
+        }
+        
+        function saveConfig() {
+            const config = {
+                startSuffix: document.getElementById('startSuffix').value,
+                maxRange: document.getElementById('maxRange').value,
+                batchSize: document.getElementById('batchSize').value,
+                startBatch: document.getElementById('startBatch').value,
+                prefix: document.getElementById('prefix').value,
+                base62Chars: document.getElementById('base62Chars').value,
+                sleepTime: document.getElementById('sleepTime').value,
+                timeout: document.getElementById('timeout').value
+            };
+            localStorage.setItem('shortLinkCheckerConfig', JSON.stringify(config));
+        }
+        
+        function loadSavedConfig() {
+            const savedConfig = localStorage.getItem('shortLinkCheckerConfig');
+            if (savedConfig) {
+                try {
+                    const config = JSON.parse(savedConfig);
+                    document.getElementById('startSuffix').value = config.startSuffix;
+                    document.getElementById('maxRange').value = config.maxRange;
+                    if (config.batchSize) document.getElementById('batchSize').value = config.batchSize;
+                    if (config.startBatch) document.getElementById('startBatch').value = config.startBatch;
+                    document.getElementById('prefix').value = config.prefix;
+                    document.getElementById('base62Chars').value = config.base62Chars;
+                    document.getElementById('sleepTime').value = config.sleepTime;
+                    document.getElementById('timeout').value = config.timeout;
+                } catch (e) {
+                    console.error('加载保存的配置失败:', e);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

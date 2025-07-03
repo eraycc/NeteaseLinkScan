@@ -1,0 +1,218 @@
+{
+    "vip_links": {
+        "FBm5xqZ": {
+            "url": "http:\/\/163cn.tv\/FBm5xqZ",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xq3": {
+            "url": "http:\/\/163cn.tv\/FBm5xq3",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xq7": {
+            "url": "http:\/\/163cn.tv\/FBm5xq7",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrb": {
+            "url": "http:\/\/163cn.tv\/FBm5xrb",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrf": {
+            "url": "http:\/\/163cn.tv\/FBm5xrf",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrj": {
+            "url": "http:\/\/163cn.tv\/FBm5xrj",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrn": {
+            "url": "http:\/\/163cn.tv\/FBm5xrn",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrr": {
+            "url": "http:\/\/163cn.tv\/FBm5xrr",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrv": {
+            "url": "http:\/\/163cn.tv\/FBm5xrv",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrz": {
+            "url": "http:\/\/163cn.tv\/FBm5xrz",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrD": {
+            "url": "http:\/\/163cn.tv\/FBm5xrD",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrH": {
+            "url": "http:\/\/163cn.tv\/FBm5xrH",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrL": {
+            "url": "http:\/\/163cn.tv\/FBm5xrL",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrP": {
+            "url": "http:\/\/163cn.tv\/FBm5xrP",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        },
+        "FBm5xrT": {
+            "url": "http:\/\/163cn.tv\/FBm5xrT",
+            "redirect": "https:\/\/y.music.163.com\/g\/vip-invite-cashier\/radsjl529?token=64FAF7762D849332C408EC7B3EB686C35568D5C10F97F9B42CA6AAD7D629C3F3"
+        }
+    },
+    "gift_links": [],
+    "checked": 500,
+    "status": "processing",
+    "message": "批次 10: 检查了 50 个链接，无有效结果",
+    "last_checked_id": 24926577146,
+    "config": {
+        "base62_chars": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        "BASE": 62,
+        "prefix": "F",
+        "sleep_time": 0.5,
+        "timeout": 5,
+        "batch_size": 50
+    },
+    "start_suffix": "Bm5xqZ",
+    "max_range": 900000000,
+    "start_batch": 1,
+    "log": [
+        {
+            "time": "2025-07-03 09:09:54",
+            "code": "BATCH_10",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 10,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:51",
+            "code": "BATCH_9",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 9,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:50",
+            "code": "BATCH_8",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 8,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:49",
+            "code": "BATCH_7",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 7,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:48",
+            "code": "BATCH_6",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 6,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:47",
+            "code": "BATCH_5",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 5,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:46",
+            "code": "BATCH_4",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 4,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:45",
+            "code": "BATCH_3",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 3,
+                "batch_size": 50,
+                "vip_found": 0,
+                "gift_found": 0,
+                "other_redirect": 50,
+                "invalid": 0,
+                "error": 0
+            }
+        },
+        {
+            "time": "2025-07-03 09:09:45",
+            "code": "BATCH_2",
+            "result": "batch_completed",
+            "details": {
+                "batch_number": 2,
+                "batch_size": 50,
+                "vip_found": 2,
+                "gift_found": 0,
+                "other_redirect": 48,
+                "invalid": 0,
+                "error": 0
+            }
+        }
+    ],
+    "created_at": "2025-07-03 09:09:43",
+    "updated_at": "2025-07-03 09:09:54",
+    "batch_stats": {
+        "total_batches": 18000000,
+        "completed_batches": 10,
+        "current_batch_size": 50,
+        "skipped_batches": 0
+    },
+    "current_code": "FBm5xy2",
+    "progress": 0
+}
