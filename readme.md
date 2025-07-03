@@ -89,6 +89,10 @@
 
 ![截图](https://cdn.cn.hongkong.tu.b2w.top/2025/07/03/563ad0c1fdae5196dd5ce1ba801c56ff.png)
 
+## 演示
+
+仅供学习测试，请自行部署[demo](https://submit.zone.id/musicvip/)
+
 ## 许可证
 
 MIT License
